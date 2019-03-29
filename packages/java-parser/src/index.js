@@ -1,9 +1,9 @@
 "use strict";
 const JavaLexer = require("./lexer");
-const JavaParser = require("./parser");
+const JavaCommentParser = require("./comments");
 
 // const startTime = new Date().getTime();
-const parser = new JavaParser();
+const parser = new JavaCommentParser();
 const BaseJavaCstVisitor = parser.getBaseCstVisitorConstructor();
 const BaseJavaCstVisitorWithDefaults = parser.getBaseCstVisitorConstructorWithDefaults();
 
