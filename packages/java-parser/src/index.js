@@ -1,3 +1,4 @@
+/* eslint no-console: 0 */
 "use strict";
 const JavaLexer = require("./lexer");
 const JavaCommentParser = require("./comments");
@@ -28,6 +29,8 @@ function parse(inputText, entryPoint = "compilationUnit") {
     );
   }
 
+  parser.initCommentsProcess(lexResult.groups.comments);
+
   // Automatic CST created when parsing
   const cst = parser[entryPoint]();
   if (parser.errors.length > 0) {
@@ -44,6 +47,8 @@ function parse(inputText, entryPoint = "compilationUnit") {
     );
   }
 
+  parser.attachComments();
+  console.log(JSON.stringify(cst));
   return cst;
 }
 
