@@ -97,6 +97,22 @@ function sortClassTypeChildren(annotations, typeArguments, identifiers, dots) {
   });
 }
 
+function getImageWithComments(token) {
+  let res = "";
+  if (token.leadingComments.length > 0) {
+    token.leadingComments.forEach(element => {
+      res += element.image + "\n";
+    });
+  }
+  res += token.image + "\n";
+  if (token.trailingComments.length > 0) {
+    token.trailingComments.forEach(element => {
+      res += element.image + "\n";
+    });
+  }
+  return res;
+}
+
 module.exports = {
   buildFqn,
   rejectAndJoin,
@@ -104,5 +120,6 @@ module.exports = {
   sortAnnotationIdentifier,
   sortClassTypeChildren,
   sortTokens,
-  matchCategory
+  matchCategory,
+  getImageWithComments
 };
