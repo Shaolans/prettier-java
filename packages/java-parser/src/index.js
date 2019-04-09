@@ -1,6 +1,8 @@
 "use strict";
 const JavaLexer = require("./lexer");
 const JavaParser = require("./parser");
+const { tokenMatcher } = require("chevrotain");
+const { tokens: t } = require("./tokens");
 
 // const startTime = new Date().getTime();
 const parser = new JavaParser();
@@ -14,7 +16,6 @@ const BaseJavaCstVisitorWithDefaults = parser.getBaseCstVisitorConstructorWithDe
 function parse(inputText, entryPoint = "compilationUnit") {
   // Lex
   const lexResult = JavaLexer.tokenize(inputText);
-  parser.input = lexResult.tokens;
 
   if (lexResult.errors.length > 0) {
     const firstError = lexResult.errors[0];
@@ -28,6 +29,49 @@ function parse(inputText, entryPoint = "compilationUnit") {
     );
   }
 
+  const tokens = lexResult.tokens;
+  const newTokens = [];
+  const headcomments = [];
+  let i = 0;
+  while (tokenMatcher(tokens[i].tokenType, t.Comment) && i < tokens.length) {
+    headcomments.push(tokens[i]);
+    i++;
+  }
+  tokens[i].leadingComments = headcomments;
+  tokens[i].trailingComments = [];
+  newTokens.push(tokens[i]);
+  let lastToken = tokens[i];
+
+  for (++i; i < tokens.length; i++) {
+    const currTok = tokens[i];
+    if (tokenMatcher(currTok.tokenType, t.Comment)) {
+      const nextToken = findNextNonCommentToken(i + 1, tokens);
+      if (nextToken == -1) {
+        lastToken.trailingComments.push(currTok);
+      } else if (
+        currTok.startOffset - lastToken.endOffset <
+        tokens[nextToken].startOffset - currTok.endOffset
+      ) {
+        lastToken.trailingComments.push(currTok);
+      } else {
+        if (!currTok.leadingComments) {
+          tokens[nextToken].leadingComments = [];
+        }
+        tokens[nextToken].leadingComments.push(currTok);
+      }
+    } else {
+      if (!currTok.leadingComments) {
+        currTok.leadingComments = [];
+      }
+      if (!currTok.trailingComments) {
+        currTok.trailingComments = [];
+      }
+      lastToken = currTok;
+      newTokens.push(currTok);
+    }
+  }
+
+  parser.input = newTokens;
   // Automatic CST created when parsing
   const cst = parser[entryPoint]();
   if (parser.errors.length > 0) {
@@ -45,6 +89,20 @@ function parse(inputText, entryPoint = "compilationUnit") {
   }
 
   return cst;
+}
+
+function findNextNonCommentToken(startOffset, tokens) {
+  let nextToken = startOffset;
+  if (nextToken >= tokens.length) {
+    return -1;
+  }
+  while (
+    tokenMatcher(tokens[nextToken].tokenType, t.Comment) &&
+    nextToken < tokens.length
+  ) {
+    nextToken++;
+  }
+  return nextToken >= tokens.length ? -1 : nextToken;
 }
 
 module.exports = {

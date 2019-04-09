@@ -153,6 +153,11 @@ const UnarySuffixOperator = createToken({
   pattern: Lexer.NA
 });
 
+const Comment = createToken({
+  name: "Comment",
+  pattern: Lexer.NA
+});
+
 // https://docs.oracle.com/javase/specs/jls/se11/html/jls-3.html#jls-3.6
 // Note [\\x09\\x20\\x0C] is equivalent to [\\t\\x20\\f] and that \\x20 represents
 // space character
@@ -164,12 +169,12 @@ createToken({
 createToken({
   name: "LineComment",
   pattern: /\/\/[^\n\r]*/,
-  group: "comments"
+  categories: [Comment]
 });
 createToken({
   name: "TraditionalComment",
   pattern: /\/\*([^*]|\*(?!\/))*\*\//,
-  group: "comments"
+  categories: [Comment]
 });
 createToken({ name: "BinaryLiteral", pattern: /0[bB][01]([01_]*[01])?[lL]?/ });
 createToken({
