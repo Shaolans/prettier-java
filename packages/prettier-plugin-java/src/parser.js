@@ -1,6 +1,6 @@
 "use strict";
 
-const javaParser = require("java-parser");
+const javaParser = require("../../java-parser/src/index");
 
 function parse(text) {
   const cst = javaParser.parse(text);
