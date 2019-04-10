@@ -1,6 +1,6 @@
 "use strict";
 const _ = require("lodash");
-const { join, concat } = require("prettier").doc.builders;
+const { join, concat, line } = require("prettier").doc.builders;
 
 function buildFqn(tokens) {
   const images = tokens.map(tok => tok.image);
@@ -98,19 +98,15 @@ function sortClassTypeChildren(annotations, typeArguments, identifiers, dots) {
 }
 
 function getImageWithComments(token) {
-  let res = "";
-  if (token.leadingComments.length > 0) {
-    token.leadingComments.forEach(element => {
-      res += element.image + "\n";
-    });
-  }
-  res += token.image + "\n";
-  if (token.trailingComments.length > 0) {
-    token.trailingComments.forEach(element => {
-      res += element.image + "\n";
-    });
-  }
-  return res;
+  const arr = [];
+  token.leadingComments.forEach(element => {
+    arr.push(element.image);
+  });
+  arr.push(token.image);
+  token.trailingComments.forEach(element => {
+    arr.push(element.image);
+  });
+  return rejectAndJoin(line, arr);
 }
 
 module.exports = {
