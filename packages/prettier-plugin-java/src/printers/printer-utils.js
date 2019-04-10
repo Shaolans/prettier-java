@@ -100,11 +100,15 @@ function sortClassTypeChildren(annotations, typeArguments, identifiers, dots) {
 function getImageWithComments(token) {
   const arr = [];
   token.leadingComments.forEach(element => {
-    arr.push(element.image);
+    element.image.split("\n").forEach(line => {
+      arr.push(line.trim());
+    });
   });
   arr.push(token.image);
   token.trailingComments.forEach(element => {
-    arr.push(element.image);
+    element.image.split("\n").forEach(line => {
+      arr.push(line.trim());
+    });
   });
   return rejectAndJoin(line, arr);
 }
