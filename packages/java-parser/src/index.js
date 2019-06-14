@@ -27,7 +27,7 @@ function parse(inputText, entryPoint = "compilationUnit") {
     );
   }
 
-  //parser.input = attachComments(lexResult.tokens, lexResult.groups.comments);
+  parser.input = attachComments(lexResult.tokens, lexResult.groups.comments);
   parser.input = lexResult.tokens;
   parser.extendCommentRange(lexResult.groups.comments);
 
@@ -47,7 +47,7 @@ function parse(inputText, entryPoint = "compilationUnit") {
     );
   }
 
-  //parser.attachComments();
+  parser.attachComments();
   /*
   console.log(JSON.stringify(cst, (key, value) => {
     if(key !== 'START_CHARS_HINT') return value;

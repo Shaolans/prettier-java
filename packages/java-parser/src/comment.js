@@ -52,11 +52,10 @@ class JavaCommentParser extends JavaParser {
     if (this.isBackTracking() === false) {
       super.cstPostNonTerminal(node, ruleCstResult, ruleName);
 
+      /*
       while (this.cursor < this.comments.length) {
-        const comment = this.comments[this.cursor];
-        if (comment.extendedRange.endOffset > node.location.startOffset) {
-          break;
-        }
+        let comment = this.comments[this.cursor];
+        if (comment.extendedRange.endOffset > node.location.startOffset) break;
         if (comment.extendedRange.endOffset === node.location.startOffset) {
           if (!node.leadingComments) {
             node.leadingComments = [];
@@ -68,8 +67,9 @@ class JavaCommentParser extends JavaParser {
         }
       }
 
+      
       while (this.cursor < this.comments.length) {
-        const comment = this.comments[this.cursor];
+        let comment = this.comments[this.cursor];
         if (node.location.endOffset < comment.extendedRange.startOffset) {
           break;
         }
@@ -83,9 +83,8 @@ class JavaCommentParser extends JavaParser {
         } else {
           this.cursor++;
         }
-      }
+      }*/
 
-      /*
       this.comments.forEach(comment => {
         if (comment.extendedRange.endOffset === node.location.startOffset) {
           this.leadingComments[comment.startOffset] = node;
@@ -94,12 +93,13 @@ class JavaCommentParser extends JavaParser {
         ) {
           this.trailingComments[comment.endOffset] = node;
         }
-      });*/
+      });
     }
   }
 
   attachComments() {
     const dup = new Set(this.comments);
+
     this.comments.forEach(comment => {
       if (this.leadingComments[comment.startOffset] && dup.has(comment)) {
         if (!this.leadingComments[comment.startOffset].leadingComments) {
