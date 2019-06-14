@@ -1,6 +1,6 @@
 "use strict";
 const JavaLexer = require("./lexer");
-const JavaParser = require("./parser");
+const JavaParser = require("./comment");
 
 // const startTime = new Date().getTime();
 const parser = new JavaParser();
@@ -28,6 +28,7 @@ function parse(inputText, entryPoint = "compilationUnit") {
   }
 
   parser.input = attachComments(lexResult.tokens, lexResult.groups.comments);
+  parser.extendCommentRange(lexResult.groups.comments);
 
   // Automatic CST created when parsing
   const cst = parser[entryPoint]();
@@ -44,6 +45,8 @@ function parse(inputText, entryPoint = "compilationUnit") {
         error.context.ruleStack.join("\n\t->")
     );
   }
+
+  parser.attachComments();
 
   return cst;
 }
