@@ -52,6 +52,40 @@ class JavaCommentParser extends JavaParser {
     if (this.isBackTracking() === false) {
       super.cstPostNonTerminal(node, ruleCstResult, ruleName);
 
+      while (this.cursor < this.comments.length) {
+        const comment = this.comments[this.cursor];
+        if (comment.extendedRange.endOffset > node.location.startOffset) {
+          break;
+        }
+        if (comment.extendedRange.endOffset === node.location.startOffset) {
+          if (!node.leadingComments) {
+            node.leadingComments = [];
+          }
+          node.leadingComments.push(comment);
+          this.comments.splice(this.cursor, 1);
+        } else {
+          this.cursor++;
+        }
+      }
+
+      while (this.cursor < this.comments.length) {
+        const comment = this.comments[this.cursor];
+        if (node.location.endOffset < comment.extendedRange.startOffset) {
+          break;
+        }
+
+        if (node.location.endOffset === comment.extendedRange.startOffset) {
+          if (!node.trailingComments) {
+            node.trailingComments = [];
+          }
+          node.trailingComments.push(comment);
+          this.comments.splice(this.cursor, 1);
+        } else {
+          this.cursor++;
+        }
+      }
+
+      /*
       this.comments.forEach(comment => {
         if (comment.extendedRange.endOffset === node.location.startOffset) {
           this.leadingComments[comment.startOffset] = node;
@@ -60,23 +94,26 @@ class JavaCommentParser extends JavaParser {
         ) {
           this.trailingComments[comment.endOffset] = node;
         }
-      });
+      });*/
     }
   }
 
   attachComments() {
+    const dup = new Set(this.comments);
     this.comments.forEach(comment => {
-      if (this.leadingComments[comment.startOffset]) {
+      if (this.leadingComments[comment.startOffset] && dup.has(comment)) {
         if (!this.leadingComments[comment.startOffset].leadingComments) {
           this.leadingComments[comment.startOffset].leadingComments = [];
         }
         this.leadingComments[comment.startOffset].leadingComments.push(comment);
+        dup.delete(comment);
       }
-      if (this.trailingComments[comment.endOffset]) {
+      if (this.trailingComments[comment.endOffset] && dup.has(comment)) {
         if (!this.trailingComments[comment.endOffset].trailingComments) {
           this.trailingComments[comment.endOffset].trailingComments = [];
         }
         this.trailingComments[comment.endOffset].trailingComments.push(comment);
+        dup.delete(comment);
       }
     });
   }

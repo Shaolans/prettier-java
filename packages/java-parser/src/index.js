@@ -27,7 +27,8 @@ function parse(inputText, entryPoint = "compilationUnit") {
     );
   }
 
-  parser.input = attachComments(lexResult.tokens, lexResult.groups.comments);
+  //parser.input = attachComments(lexResult.tokens, lexResult.groups.comments);
+  parser.input = lexResult.tokens;
   parser.extendCommentRange(lexResult.groups.comments);
 
   // Automatic CST created when parsing
@@ -46,11 +47,17 @@ function parse(inputText, entryPoint = "compilationUnit") {
     );
   }
 
-  parser.attachComments();
+  //parser.attachComments();
+  /*
+  console.log(JSON.stringify(cst, (key, value) => {
+    if(key !== 'START_CHARS_HINT') return value;
+  }, 2, 2))
+*/
 
   return cst;
 }
 
+// eslint-disable-next-line
 function attachComments(tokens, comments) {
   const attachComments = [...comments];
 
